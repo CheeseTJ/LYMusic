@@ -1,0 +1,11 @@
+.pTop {
+	padding-top: var(--status-bar-height);
+}
+
+.mTop {
+	margin-top: var(--status-bar-height);
+}
+
+.fx1 {
+	flex: 1;
+}

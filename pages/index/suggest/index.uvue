@@ -1,0 +1,18 @@
+<template>
+	<scroll-view class="fx1">
+		12
+	</scroll-view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+
+			};
+		}
+	}
+</script>
+
+<style lang="scss">
+</style>

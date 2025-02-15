@@ -1,0 +1,55 @@
+<template>
+	<view class="login">
+		<image class="bg" src="/static/img/bg.png" mode="widthFix"></image>
+		<view class="content">
+			<image class="logo" src="/static/logo.png"></image>
+			<!-- <image class="record"></image> -->
+			<text class="tip">Welcome</text>
+			<text class="tip">Back</text>
+			<text class="">My music</text>
+			<text>Give me more music</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				title: 'Hello'
+			}
+		},
+		onLoad() {
+
+		},
+		methods: {
+
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.login {
+		position: relative;
+		flex: 1;
+		flex-direction: row;
+
+		.bg {
+			position: absolute;
+			z-index: -1;
+			width: 750rpx;
+		}
+	}
+
+	.content {
+		padding-top: var(--status-bar-height);
+		flex: 1;
+		width: 100%;
+
+		.logo {
+			margin: 70rpx;
+			width:80rpx;
+			height:80rpx;
+		}
+	}
+</style>
