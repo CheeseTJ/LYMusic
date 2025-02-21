@@ -1,0 +1,31 @@
+<template>
+	<view class="searchBar pTop">
+		<fui-icon name="back"></fui-icon>
+		<view class="mid">
+			<slot></slot>
+		</view>
+		<fui-icon name="search"></fui-icon>
+	</view>
+</template>
+
+<script>
+	export default {
+		name: "SearchBar",
+		data() {
+			return {
+
+			};
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.searchBar {
+		flex-direction: row;
+		align-items: center;
+
+		.mid {
+			flex: 1;
+		}
+	}
+</style>

@@ -1,48 +1,18 @@
-const config = {
-	host:'',
-	devHost:'',
-	prefix:'',
-}
-// 适配url地址
-const calcUrl = url => {
-	if (url.startsWith('http')) return url;
-	return config.host + config.prefix + url;
-}
+function request(method : string, url : string, data : any = {}) : Promise<any> {
+	return new Promise((s, f) => {
+		uni.request<any>({
+			url,
+			data,
+			method,
+			success: (res : RequestSuccess<any>) => s(res.data as any),
+			fail: f
+		})
 
-// 响应拦截
-const successCheck = res => {
-	return res
-}
-// 错误拦截
-const errCheck = err => {
-	return err
-}
-const http = (url, data = {}, options = {}) => new Promise((resolve, reject) => {
-	uni.request({
-		url: calcUrl(url),
-		data,
-		...options,
-		header: {
-			token: uni.getStorageSync('ebizToken'),
-			...(options.header ?? {})
-		},
-		method: options.method || 'GET',
-		timeout: 60000,
-		dataType: 'json',
-		success: res => {
-			resolve(successCheck(res.data))
-		},
-		fail: err => {
-			reject(errCheck(err))
-		}
-	})
-})
-
-const request = {
-	get: http,
-	post: (url, data, options) => http(url, data, {
-		...options,
-		method: "POST",
 	})
 }
-export default request;
+export function get(url : string, data : any = {}) : Promise<any> {
+	return request("GET", url, data)
+}
+export function post(url : string, data : any = {}) : Promise<any> {
+	return request("Post", url, data)
+}

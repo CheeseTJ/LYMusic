@@ -1,0 +1,40 @@
+import { get, post } from '@/src/tools/request.uts'
+
+const getMusicList = (id : Number) : Promise<UTSJSONObject[]> => {
+	return new Promise((s, _) => {
+		get(`https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?g_tk=5381&uin=0&format=jsonp&jsonpCallback=callback&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&tpl=3&page=detail&type=top&topid=${id}&_=1512563984096%E4%BD%9C%E8%80%85%EF%BC%9Acodedx%E9%93%BE%E6%8E%A5%EF%BC%9Ahttps://juejin.cn/post/6844903535067447303%E6%9D%A5%E6%BA%90%EF%BC%9A%E7%A8%80%E5%9C%9F%E6%8E%98%E9%87%91%E8%91%97%E4%BD%9C%E6%9D%83%E5%BD%92%E4%BD%9C%E8%80%85%E6%89%80%E6%9C%89%E3%80%82%E5%95%86%E4%B8%9A%E8%BD%AC%E8%BD%BD%E8%AF%B7%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85%E8%8E%B7%E5%BE%97%E6%8E%88%E6%9D%83%EF%BC%8C%E9%9D%9E%E5%95%86%E4%B8%9A%E8%BD%AC%E8%BD%BD%E8%AF%B7%E6%B3%A8%E6%98%8E%E5%87%BA%E5%A4%84%E3%80%82`).then(res => {
+			let str = ((res as String).slice(10, -1) as String);
+			str = str.replace('\n', '')
+			let data = JSON.parse<UTSJSONObject>(str)!.getArray('songlist')! as UTSJSONObject[];
+			s(data)
+		})
+	})
+}
+
+export function RecMusicList(begin : number = 0, end : number = 5) : Promise<UTSJSONObject[]> {
+	return new Promise((s, _) => {
+		get('https://c.y.qq.com/v8/fcg-bin/fcg_myqq_toplist.fcg?g_tk=5381&uin=0&format=jsonp&jsonpCallback=callback&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&_=1512554796112').then(res => {
+			let str = (res as String).slice(9, -1) as String;
+			let data = (JSON.parse<UTSJSONObject>(str)!.getJSON('data')!.getArray('topList')! as UTSJSONObject[]).slice(begin, end);
+			Promise.all(data.map(i => getMusicList(i.getNumber('id')!))).then((lists : UTSJSONObject[][]) => {
+				let musicLists = lists.map((list : UTSJSONObject[], inx : number) : UTSJSONObject => {
+					return {
+						title: data[inx].getString('topTitle')!,
+						list
+					}
+				}) as UTSJSONObject[]
+				s(musicLists)
+			})
+			// https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg?g_tk=5381&uin=0&format=jsonp&jsonpCallback=callback&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&tpl=3&page=detail&type=top&topid=4&_=1512563984096%E4%BD%9C%E8%80%85%EF%BC%9Acodedx%E9%93%BE%E6%8E%A5%EF%BC%9Ahttps://juejin.cn/post/6844903535067447303%E6%9D%A5%E6%BA%90%EF%BC%9A%E7%A8%80%E5%9C%9F%E6%8E%98%E9%87%91%E8%91%97%E4%BD%9C%E6%9D%83%E5%BD%92%E4%BD%9C%E8%80%85%E6%89%80%E6%9C%89%E3%80%82%E5%95%86%E4%B8%9A%E8%BD%AC%E8%BD%BD%E8%AF%B7%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85%E8%8E%B7%E5%BE%97%E6%8E%88%E6%9D%83%EF%BC%8C%E9%9D%9E%E5%95%86%E4%B8%9A%E8%BD%AC%E8%BD%BD%E8%AF%B7%E6%B3%A8%E6%98%8E%E5%87%BA%E5%A4%84%E3%80%82
+		})
+	})
+}
+
+export const MusicInfo = (query : UTSJSONObject) : Promise<UTSJSONObject> => new Promise((s, f) => {
+	get('https://api.tjit.net/api/qqmusic/', {
+		key: 'qY1Yfk1zH7xfLQFz74iHE8QddF',
+		id: query.getString('id'),
+		type: 'song',
+		cache: 1,
+	}).then((res) => s(res as UTSJSONObject))
+})

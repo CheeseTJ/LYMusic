@@ -37,4 +37,5 @@
 <style>
 	@import './uni_modules/firstui-uvue/components/fui-css/firstui.css';
 	@import '@/src/css/common.css';
+	@import 'static/font/icon.css'
 </style>

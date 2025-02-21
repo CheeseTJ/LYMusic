@@ -1,6 +1,6 @@
 import App from './App.uvue'
-
-import { createSSRApp } from 'vue'
+import { createSSRApp } from 'vue';
+import '@/src/tools/player.uts'
 export function createApp() {
 	const app = createSSRApp(App)
 	return {

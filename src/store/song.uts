@@ -1,0 +1,68 @@
+import { Local } from "@/src/tools/utils";
+import * as PlayerBus from '@/src/bus/player.uts';
+
+type stateT = {
+	favorList : UTSJSONObject[],
+	playList : UTSJSONObject[],
+	nowSong : UTSJSONObject,
+	nowSongId : String,
+	nowSongInx : Number,
+}
+
+export const state = reactive({
+	favorList: Local.array<UTSJSONObject>('favorList'),
+	playList: Local.array<UTSJSONObject>('playList'),
+	nowSong: Local.object('nowSong'),
+	nowSongId: Local.string('nowSongId'),
+	nowSongInx: Local.number('nowSongInx'),
+} as stateT);
+
+
+export const isFavor = (id : String) : Boolean => state.favorList.map((i : UTSJSONObject) : String => i.getString('mid')!).includes(id);
+
+export const isPlay = (id : String) : Boolean => state.nowSongId == id;
+
+export const inPlayList = (id : String) : Boolean => state.playList.map((i : UTSJSONObject) : String => i.getString('mid')!).includes(id);
+
+export const calcPrefix = (type : String, id : String) => {
+	return `https://api.tjit.net/api/qqmusic/?key=qY1Yfk1zH7xfLQFz74iHE8QddF&type=${type}&id=${id}&size=&cache=1`
+}
+
+export const setPlayList = (e : UTSJSONObject[]) => {
+	state.playList = e;
+	playNow(e[0])
+}
+
+export const addFavor = (e : UTSJSONObject) => {
+	state.favorList.push(e);
+	stateSync()
+}
+
+export const playNow = (e : UTSJSONObject) => {
+	state.nowSong = e;
+	state.nowSongId = e.getString('mid')!;
+	if (!inPlayList(state.nowSongId)) {
+		state.playList.splice(state.nowSongInx as number, 0, e);
+	}
+	state.nowSongInx = state.playList.findIndex((i : UTSJSONObject) => i.getString('mid') !== state.nowSongId);
+	PlayerBus.emit<UTSJSONObject>('PLAYER:Play', e);
+	stateSync()
+}
+
+export const next = () => {
+	let inx = state.nowSongInx as number;
+	if (inx == state.playList.length - 1) {
+		inx = 0;
+	}
+	playNow(state.playList[inx])
+}
+
+export const stateSync = () => {
+	for (let i in state) {
+		uni.setStorageSync(i, state[i]!)
+	}
+}
+
+PlayerBus.on<String>('PLAYER:PlayEnd', (msg : String) => {
+	next()
+})

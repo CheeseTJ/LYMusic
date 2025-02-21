@@ -1,0 +1,9 @@
+@font-face {
+	font-family: "LYIcon";
+	src: url('https://cdn2.codesign.qq.com/icons/5OjE7NgEbM8mM03/latest/iconfont.ttf?t=b6cebefaeb5630d3cb370e83bb5d64bd');
+}
+
+.LYIcon {
+	font-family: "LYIcon" !important;
+	font-size: 16px;
+}

@@ -2,16 +2,18 @@
 	<view class="tabBar pTop">
 		<fui-icon name="search" size="50"></fui-icon>
 		<view class="fx1">
-			<fui-tabs :tabs="tabs" @change="tabChange" :current="current" selectedColor="#333"
+			<fui-tabs background="transparent" :tabs="tabs" @change="tabChange" :current="current" selectedColor="#333"
 				sliderBackground="#b055c9"></fui-tabs>
 		</view>
 		<fui-icon name="setup" size="50" @click="setting"></fui-icon>
 	</view>
-	<swiper class="fx1" :current="current">
+	<swiper class="fx1" :current="current" @change="swiperChange">
 		<swiper-item>
 			<Suggest></Suggest>
 		</swiper-item>
-		<swiper-item></swiper-item>
+		<swiper-item>
+			<Favorites></Favorites>
+		</swiper-item>
 		<swiper-item></swiper-item>
 	</swiper>
 </template>
@@ -19,8 +21,9 @@
 <script>
 	import { FuiTabsItemParam } from '@/uni_modules/firstui-uvue/components/fui-types/index.uts'
 	import Suggest from './suggest'
+	import Favorites from './favorites'
 	export default {
-		components: { Suggest },
+		components: { Suggest, Favorites },
 		data() {
 			return {
 				current: 0,
@@ -37,6 +40,9 @@
 			tabChange(e : FuiTabsItemParam) {
 				this.current = e.index!;
 			},
+			swiperChange(e : UniSwiperChangeEvent) {
+				this.current = e.detail.current
+			},
 			setting() {
 
 			}
@@ -49,5 +55,9 @@
 		flex-direction: row;
 		align-items: center;
 		padding: 0 30rpx;
+		position: fixed;
+		top: 0;
+		width: 100%;
+		z-index: 99;
 	}
 </style>

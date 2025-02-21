@@ -9,3 +9,19 @@
 .fx1 {
 	flex: 1;
 }
+
+.ml {
+	margin-left: auto;
+}
+
+.mt {
+	margin-right: auto;
+}
+
+.p10 {
+	padding: 10rpx;
+}
+
+.p15 {
+	padding: 15rpx;
+}

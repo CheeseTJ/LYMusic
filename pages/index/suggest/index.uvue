@@ -1,18 +1,181 @@
 <template>
-	<scroll-view class="fx1">
-		12
-	</scroll-view>
+	<view class="suggest fx1">
+		<Detail @playALL="playALL" @getBtnPos="getBtnPos" :recShow="recShow"></Detail>
+		<scroll-view class="songList" :class={recShow} :style="{height:popupH+'px'}" :showScrollbar="false">
+			<view style="height:45rpx"></view>
+			<fui-loading type="row" v-if="loading"></fui-loading>
+			<BtnBox v-for="(i,inx) in recMusicList" customStyle="border-radius:10rpx;" :key="inx">
+				<view class="songLine">
+					<view class="songInfo" @click="toDetail(i)">
+						<text class="songName" :class="{isPlay:calcIsPlay(i)}">
+							{{ i.songname }}
+						</text>
+						<text class="singer">
+							{{ calcSinger(i) }}
+						</text>
+					</view>
+					<view @click="openMenu(i)" class="p15">
+						<fui-icon name="operate" :size="50" color="#afafaf"></fui-icon>
+					</view>
+					<view class="opsMenu" :class="{act:actId == i.getString('songmid')!}" @click="actId=''">
+						<view class="p15">
+							<fui-icon name="like-fill" :color="calcIsFavor(i)?'#f31111':'#999'" :size="50"
+								@click="addFavor(i)"></fui-icon>
+						</view>
+						<view class="p15">
+							<fui-icon name="suspend" :size="50" @click="play(i)"></fui-icon>
+						</view>
+					</view>
+				</view>
+			</BtnBox>
+		</scroll-view>
+	</view>
 </template>
 
 <script>
+	import * as songState from '@/src/store/song'
+	import { RecMusicList } from '../../../src/api';
+	import Detail from '../../detail'
 	export default {
+		components: { Detail },
 		data() {
 			return {
-
+				popupH: 0,
+				actId: '',
+				recShow: true,
+				recMusicList: [] as UTSJSONObject[],
+				timer: 0,
+				loading: true,
 			};
+		},
+		created() {
+			this.loading = true;
+			RecMusicList(1, 2).then((res) => {
+				this.loading = false;
+				this.recMusicList = ((res as UTSJSONObject[])[0].getArray('list')! as UTSJSONObject[]).map((i : UTSJSONObject) : UTSJSONObject => i.getJSON('data')!) as UTSJSONObject[];
+			})
+		},
+		methods: {
+			calcIsPlay(e : UTSJSONObject) : Boolean {
+				return songState.isPlay(e.getString('songmid')!);
+			},
+			calcSinger(e : UTSJSONObject) : String {
+				return (e.getArray('singer')! as UTSJSONObject[])[0].getString('name')!
+			},
+			calcIsFavor(e : UTSJSONObject) : Boolean {
+				return songState.isFavor(e.getString('songmid')!);
+			},
+			formatSong(e : UTSJSONObject) : UTSJSONObject {
+				return {
+					mid: e.getString('songmid')!,
+					title: e.getString('songname')!,
+					author: this.calcSinger(e),
+					url: songState.calcPrefix('url', e.getString('songmid')!),
+					lrc: songState.calcPrefix('lrc', e.getString('songmid')!),
+					pic: ''
+				} as UTSJSONObject
+			},
+			addFavor(e : UTSJSONObject) {
+				songState.addFavor(this.formatSong(e))
+			},
+			openMenu(e : UTSJSONObject) {
+				if (this.timer != 0) {
+					clearTimeout(this.timer)
+				}
+				this.actId = e.getString('songmid')!;
+				this.timer = setTimeout(() => {
+					this.actId = '';
+				}, 5000)
+			},
+			toDetail(e : UTSJSONObject) {
+				uni.navigateTo({
+					url: '../detail/index'
+				})
+				this.play(e)
+			},
+			play(e : UTSJSONObject) {
+				songState.playNow(this.formatSong(e))
+			},
+			playALL() {
+				let list = this.recMusicList.map(this.formatSong) as UTSJSONObject[];
+				songState.setPlayList(list);
+				this.recShow = false;
+			},
+			getBtnPos(e : number) {
+				this.popupH = e;
+				console.log(this.popupH)
+			}
 		}
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+	.suggest {
+		position: relative;
+
+		.songList {
+			flex: 1;
+			margin-top: -40rpx;
+			background-color: white;
+			border-radius: 40rpx;
+			align-items: center;
+			width: 100%;
+			padding: 30rpx 15rpx;
+			position: fixed;
+			left: 0;
+			transition: bottom .5s;
+			bottom: -100%;
+			z-index: 3;
+
+			&.recShow {
+				bottom: 0%;
+			}
+
+			.songLine {
+				padding: 15rpx 0 15rpx 15rpx;
+				width: 100%;
+				flex-direction: row;
+				justify-content: space-between;
+				align-items: center;
+				position: relative;
+
+				.songInfo {
+					flex: 1;
+
+					.songName {
+						color: #333;
+						font-size: 28rpx;
+						margin-bottom: 10rpx;
+
+						&.isPlay {
+							color: #d412ff;
+						}
+					}
+
+					.singer {
+						color: #afafaf;
+						font-size: 24rpx;
+					}
+				}
+
+				.songItem {
+					width: 100%;
+					background-color: transparent;
+					border: none;
+				}
+
+				.opsMenu {
+					position: absolute;
+					transition: right .5s;
+					background: white;
+					right: -200rpx;
+					flex-direction: row;
+
+					&.act {
+						right: 15rpx;
+					}
+				}
+			}
+		}
+	}
 </style>

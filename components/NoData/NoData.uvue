@@ -1,0 +1,33 @@
+<template>
+	<view class="noData" :style="{height}">
+		<fui-empty src="/static/img/empty.png" :title="title" :descr="desc">
+
+		</fui-empty>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			height: {
+				type: String,
+				default: '750rpx'
+			},
+			title: {
+				type: String,
+				default: ''
+			},
+			desc: {
+				type: String,
+				default: '暂无数据'
+			}
+		},
+		name: "NoData",
+	}
+</script>
+
+<style lang="scss" scoped>
+	.noData {
+		justify-content: center;
+	}
+</style>

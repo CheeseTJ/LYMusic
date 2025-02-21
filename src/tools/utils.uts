@@ -1,0 +1,32 @@
+
+class GetLocal {
+	string(key : String) : String {
+		return uni.getStorageSync(key) as String;
+	}
+	number(key : String) : Number {
+		let val = 0 as Number;
+		let local = uni.getStorageSync(key);
+		if (local != '') {
+			val = local as Number;
+		}
+		return val as Number
+	}
+	array<T>(key : String) : T[] {
+		let val = [] as T[]
+		let local = uni.getStorageSync(key);
+		if (local != '') {
+			val = local as T[];
+		}
+		return val as T[]
+	}
+	object(key : String) {
+		let val = {} as UTSJSONObject;
+		let local = uni.getStorageSync(key);
+		if (local != '') {
+			val = local as UTSJSONObject;
+		}
+		return val as UTSJSONObject
+	}
+}
+
+export const Local = new GetLocal();

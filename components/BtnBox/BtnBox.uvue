@@ -1,0 +1,65 @@
+<template>
+	<view class="button" ref="btn" @touchmove="press">
+		<slot></slot>
+		<view class="mask" :class="{act}"></view>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+			customStyle: {
+				type: String,
+				default: ''
+			},
+		},
+		data() {
+			return {
+				act: false,
+				timer: 0
+			}
+		},
+		mounted() {
+			let str = this.customStyle.trim();
+			if (str.endsWith(';')) {
+				str = str.slice(0, -1);
+			}
+			str.split(';').forEach((i : String) => {
+				let entries = i.split(':') as String[];
+				(this.$refs['btn'] as Element).style.setProperty(entries[0], entries[1])
+			})
+		},
+		methods: {
+			press() {
+				this.act = true;
+				setTimeout(() => {
+					this.act = false;
+				}, 700)
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.button {
+		position: relative;
+		width: 100%;
+
+		.mask {
+			&.act {
+				opacity: 1;
+			}
+
+			pointer-events: none;
+			opacity: 0;
+			top: 0;
+			left: 0;
+			width: 1000rpx;
+			height: 1000rpx;
+			position: absolute;
+			background: rgba(0, 0, 0, .1);
+			transition: opacity .3s;
+			z-index: 10;
+		}
+	}
+</style>

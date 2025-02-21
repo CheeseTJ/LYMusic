@@ -1,0 +1,20 @@
+import { createInnerAudioContext } from '@/uni_modules/lime-audio-player';
+import * as PlayerBus from '../bus/player';
+export const player = createInnerAudioContext();
+
+player.onCanplay((_) => {
+	console.log("可以播放了")
+	player.play()
+})
+
+player.onEnded(() => {
+	console.log("播放结束");
+	PlayerBus.emit<String>('PLAYER:PlayEnd', '');
+})
+
+const changePlay = (e : UTSJSONObject) => {
+	player.pause();
+	player.src = e.getString('url')!;
+}
+
+PlayerBus.on<UTSJSONObject>('PLAYER:Play', changePlay)

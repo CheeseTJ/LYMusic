@@ -1,0 +1,28 @@
+const types = ['PLAYER:PlayEnd', 'PLAYER:Next', 'PLAYER:Play'] as String[];
+const events = {
+
+} as UTSJSONObject;
+
+export function on<T>(type : string, fn : (args : T) => void) {
+	if (!types.includes(type)) {
+		console.log('PLAYER:未知类型')
+		return
+	}
+	let list = events.getArray(type);
+	if (list == null) {
+		events.set(type, [] as ((args : T) => void)[])
+	}
+	(events.getArray(type)! as ((args : T) => void)[]).push(fn)
+}
+
+export function off<T>(type : string, fn : (args : T) => void) {
+	let list = events.getArray(type);
+	if (list == null) return;
+	events.set(type, (events.getArray(type)! as ((args : T) => void)[]).filter((cb : (args : T) => void) => fn !== cb));
+}
+
+export function emit<T>(type : string, args : T) {
+	let list = events.getArray(type);
+	if (list == null) return;
+	(events.getArray(type)! as ((args : T) => void)[]).forEach((cb : (args : T) => void) => cb(args));
+}

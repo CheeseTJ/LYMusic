@@ -1,0 +1,49 @@
+<template>
+	<text class="LYIcon" :style="style">
+		{{calcText(name)}}
+	</text>
+</template>
+
+<script>
+	export default {
+		name: "Icon",
+		props: {
+			size: {
+				type: Number,
+				default: 28
+			},
+			color: {
+				type: String,
+				default: "#333"
+			},
+			name: {
+				type: String,
+				default: ""
+			}
+		},
+		data() {
+			return {
+				icons: {
+					play: '\ue001'
+				} as UTSJSONObject
+			};
+		},
+		computed: {
+			style() : object {
+				let obj = new Map<String, String>();
+				obj.set('fontSize', this.size + 'rpx');
+				obj.set('color', this.color);
+				return obj
+			}
+		},
+		methods: {
+			calcText(key : String) : String {
+				return this.icons.getString(key)!
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+
+</style>

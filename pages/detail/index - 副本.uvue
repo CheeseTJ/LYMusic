@@ -1,0 +1,103 @@
+<template>
+	<view class="detail fx1" ref="detail">
+		<image class="bg fx1" src="/static/img/bg0.png"></image>
+		<view class="top pTop">
+			<view class="welcome">
+				<text class="txt">HI JuneT</text>
+				<text class="txt">Made for you</text>
+			</view>
+		</view>
+		<view class="disk">
+			<view class="playBtn" hover-class="fui-button__hover">
+				<Icon :size="60" color="white" name="play" @click="playALL"></Icon>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import * as PlayerBus from '@/src/bus/player.uts';
+	import { player } from '@/src/tools/player';
+	export default {
+		data() {
+			return {
+				background: ``
+			};
+		},
+		onLoad() {
+			PlayerBus.on<UTSJSONObject>('PLAYER:Play', (e : UTSJSONObject) => {
+				console.log(e)
+			});
+		},
+		mounted() {
+			setTimeout(() => {
+				let screenH = uni.getSystemInfoSync().screenHeight;
+				let query = uni.createSelectorQuery();
+				query.select('.playBtn').boundingClientRect((e : any) => {
+					let pos = JSON.parse<NodeInfo>(JSON.stringify(e))!;
+					let halfH = pos.height! * 0.5;
+					this.$emit('getBtnPos', screenH - pos.top! - halfH);
+				}).exec()
+			}, 300)
+		},
+		methods: {
+			playALL() {
+				this.$emit('playALL')
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	.detail {
+		position: relative;
+
+		.bg {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		.top {
+			position: relative;
+			align-items: center;
+
+			.welcome {
+				padding-top: 140rpx;
+				align-items: center;
+
+				.txt {
+					color: white;
+				}
+			}
+		}
+
+		.disk {
+			position: fixed;
+			width: 300rpx;
+			height: 300rpx;
+			border-radius: 150rpx;
+			background-color: black;
+			align-items: center;
+			justify-content: center;
+			top: 340rpx;
+			align-self: center;
+			z-index: 3;
+
+			.playBtn {
+				position: fixed;
+				align-self: center;
+				top: 430rpx;
+				z-index: 4;
+				background: #d412ff;
+				width: 120rpx;
+				height: 120rpx;
+				align-items: center;
+				justify-content: center;
+				border-radius: 60rpx;
+			}
+		}
+	}
+</style>

@@ -1,18 +1,14 @@
 <template>
-	<!-- #ifdef APP -->
 	<scroll-view style="flex:1">
-	<!-- #endif -->
-		
-	<!-- #ifdef APP -->
+
 	</scroll-view>
-	<!-- #endif -->
 </template>
 
 <script>
 	export default {
 		data() {
 			return {
-				
+
 			};
 		}
 	}
