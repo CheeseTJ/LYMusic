@@ -1,4 +1,4 @@
-const types = ['PLAYER:PlayEnd', 'PLAYER:Next', 'PLAYER:Play'] as String[];
+const types = ['PLAYER:PlayEnd', 'PLAYER:Next', 'PLAYER:Play', 'PLAYER:PlayTimeChange'] as String[];
 const events = {
 
 } as UTSJSONObject;

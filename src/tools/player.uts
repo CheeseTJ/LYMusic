@@ -12,6 +12,10 @@ player.onEnded(() => {
 	PlayerBus.emit<String>('PLAYER:PlayEnd', '');
 })
 
+player.onTimeUpdate(() => {
+	PlayerBus.emit<Number>('PLAYER:PlayTimeChange', player.currentTime)
+})
+
 const changePlay = (e : UTSJSONObject) => {
 	player.pause();
 	player.src = e.getString('url')!;

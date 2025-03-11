@@ -6,6 +6,18 @@
 	margin-top: var(--status-bar-height);
 }
 
+.page {
+	background-color: #f8f8f8;
+}
+
+.content {
+	padding: 30rpx;
+}
+
+.row {
+	flex-direction: row;
+}
+
 .fx1 {
 	flex: 1;
 }

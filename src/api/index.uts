@@ -11,6 +11,7 @@ const getMusicList = (id : Number) : Promise<UTSJSONObject[]> => {
 	})
 }
 
+
 export function RecMusicList(begin : number = 0, end : number = 5) : Promise<UTSJSONObject[]> {
 	return new Promise((s, _) => {
 		get('https://c.y.qq.com/v8/fcg-bin/fcg_myqq_toplist.fcg?g_tk=5381&uin=0&format=jsonp&jsonpCallback=callback&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&_=1512554796112').then(res => {
@@ -38,3 +39,24 @@ export const MusicInfo = (query : UTSJSONObject) : Promise<UTSJSONObject> => new
 		cache: 1,
 	}).then((res) => s(res as UTSJSONObject))
 })
+
+
+const calcTime = (e : String) : Number => {
+	let time = e.slice(1).split(':');
+	return parseInt(time[0]) * 60 + parseFloat(time[1])
+}
+
+export const SongLrc = (url : String) : Promise<UTSJSONObject[]> => new Promise<UTSJSONObject[]>((s, f) => {
+	get(url, {}).then((res) => {
+		const oriLrc = res.toString().split('\n');
+		const inx = oriLrc.findIndex((i : String) : boolean => i.startsWith('[00:'));
+		const arr = oriLrc.slice(inx).map((i : String) : String[] => i.split(']'));
+		const final = arr.map((i : String[]) : UTSJSONObject => {
+			return {
+				time: calcTime(i[0]),
+				text: i[1]
+			}
+		})
+		s(final)
+	})
+});

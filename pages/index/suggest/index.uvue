@@ -1,7 +1,9 @@
 <template>
 	<view class="suggest fx1">
-		<Detail @playALL="playALL" @getBtnPos="getBtnPos" :recShow="recShow"></Detail>
-		<scroll-view class="songList" :class={recShow} :style="{height:popupH+'px'}" :showScrollbar="false">
+		<Detail @playALL="playALL" @getBtnPos="getBtnPos" :recShow="recShow" @moveEnd="moveEnd">
+		</Detail>
+		<scroll-view class="songList" :style="{height:popupH+'px',bottom:recShow?0:-popupH+'px'}"
+			:showScrollbar="false">
 			<view style="height:45rpx"></view>
 			<fui-loading type="row" v-if="loading"></fui-loading>
 			<BtnBox v-for="(i,inx) in recMusicList" customStyle="border-radius:10rpx;" :key="inx">
@@ -48,6 +50,7 @@
 				loading: true,
 			};
 		},
+
 		created() {
 			this.loading = true;
 			RecMusicList(1, 2).then((res) => {
@@ -97,13 +100,16 @@
 				songState.playNow(this.formatSong(e))
 			},
 			playALL() {
+				if (this.recMusicList.length == 0) return;
 				let list = this.recMusicList.map(this.formatSong) as UTSJSONObject[];
 				songState.setPlayList(list);
 				this.recShow = false;
 			},
 			getBtnPos(e : number) {
 				this.popupH = e;
-				console.log(this.popupH)
+			},
+			moveEnd(e : boolean) {
+				this.recShow = e;
 			}
 		}
 	}
@@ -124,12 +130,7 @@
 			position: fixed;
 			left: 0;
 			transition: bottom .5s;
-			bottom: -100%;
 			z-index: 3;
-
-			&.recShow {
-				bottom: 0%;
-			}
 
 			.songLine {
 				padding: 15rpx 0 15rpx 15rpx;

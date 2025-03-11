@@ -7,7 +7,7 @@
 		</view>
 		<fui-icon name="setup" size="50" @click="setting"></fui-icon>
 	</view>
-	<swiper class="fx1" :current="current" @change="swiperChange">
+	<swiper class="fx1" :current="current" @change="swiperChange" :disable-touch="true">
 		<swiper-item>
 			<Suggest></Suggest>
 		</swiper-item>

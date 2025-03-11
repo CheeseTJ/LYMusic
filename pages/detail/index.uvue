@@ -1,28 +1,46 @@
 <template>
-	<view class="detail fx1" ref="detail">
+	<view class="detail fx1" ref="detail" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
 		<image class="bg fx1" src="/static/img/bg0.png"></image>
 		<view class="top pTop">
 			<view class="welcome">
-				<text class="txt">HI JuneT</text>
-				<text class="txt">Made for you</text>
+				<text class="txt">{{songInfo.title}}</text>
+				<text class="txt">{{songInfo.author}}</text>
 			</view>
 		</view>
 		<view class="disk">
 			<view class="playBtn" hover-class="fui-button__hover">
 				<Icon :size="60" color="white" name="play" @click="playALL"></Icon>
 			</view>
-			<view class="mask" v-if="recShow">
+			<view class="mask" :class="{recShow}">
 				<view class="left"></view>
 				<view class="mid"></view>
 				<view class="right"></view>
 			</view>
 		</view>
+		<list-view class="lrcList" :scroll-into-view="nowLrcId" :scroll-with-animation="true">
+			<list-item v-for="(i,inx) in lrcList" class="content-item" :id="calcID(inx)">
+				<text class="text">{{i.text}}</text>
+			</list-item>
+		</list-view>
 	</view>
 </template>
 
 <script>
+	type SongInfoT = {
+		author : String,
+		lrc : String,
+		mid : String,
+		pic : String,
+		title : String,
+		url : String
+	}
+	type LrcT = {
+		time : Number,
+		text : String
+	}
 	import * as PlayerBus from '@/src/bus/player.uts';
 	import { player } from '@/src/tools/player';
+	import { SongLrc } from '@/src/api/index.uts'
 	export default {
 		props: {
 			recShow: {
@@ -32,12 +50,41 @@
 		},
 		data() {
 			return {
+				startY: 0,
+				endY: 0,
+				startTime: 0,
+				endTime: 0,
+				threshold: 50,// 识别门槛
+				songInfo: {
+					author: 'Made for you',
+					lrc: '',
+					mid: '',
+					pic: '',
+					title: 'Hi JuneT',
+					url: ''
+				} as SongInfoT,
+				lrcList: [] as LrcT[],
+				nowLrcInx: 0,
 			};
+		},
+		computed: {
+			scrollH() {
+				return this.startY - this.endY
+			},
+			nowLrcId() : String {
+				return 'lrc' + this.nowLrcInx
+			}
 		},
 		onLoad() {
 			PlayerBus.on<UTSJSONObject>('PLAYER:Play', (e : UTSJSONObject) => {
-				console.log(e)
+				this.songInfo = JSON.parse<SongInfoT>(JSON.stringify(e))!;
+				SongLrc(e.getString('lrc')!).then((res : UTSJSONObject[]) => {
+					this.lrcList = JSON.parse<LrcT[]>(JSON.stringify(res))!;
+				})
 			});
+			PlayerBus.on<Number>('PLAYER:PlayTimeChange', (e : Number) => {
+				this.nowLrcInx = this.lrcList.findIndex((i : LrcT) => i.time >= e);
+			})
 		},
 		mounted() {
 			let screenH = uni.getSystemInfoSync().screenHeight;
@@ -48,8 +95,28 @@
 			}).exec()
 		},
 		methods: {
+			calcID(inx : Number) : String {
+				return 'lrc' + inx;
+			},
 			playALL() {
-				this.$emit('playALL')
+				this.$emit('playALL');
+			},
+			touchStart(e : UniTouchEvent) {
+				this.startY = e.changedTouches[0].clientY;
+				this.startTime = Date.now();
+			},
+			touchMove(e : UniTouchEvent) {
+				this.endY = e.changedTouches[0].clientY;
+
+			},
+			touchEnd(e : UniTouchEvent) {
+				if (Date.now() - this.startTime < 100 && this.songInfo.mid != '') {
+					this.$emit('moveEnd', false)
+				} else {
+					this.$emit('moveEnd', Math.abs(this.scrollH) > this.threshold ? this.scrollH > 0 : this.recShow ? !this.recShow : this.recShow);
+				}
+				this.startY = 0;
+				this.endY = 0;
 			}
 		}
 	}
@@ -113,6 +180,13 @@
 				width: 100%;
 				height: 50%;
 				flex-direction: row;
+				opacity: 0;
+
+				&.recShow {
+					opacity: 1;
+					transition-property: opacity;
+					transition-delay: .5s;
+				}
 
 				.left,
 				.right {
@@ -136,6 +210,11 @@
 					margin: 0 -20rpx;
 				}
 			}
+		}
+
+		.lrcList {
+			padding-top: 640rpx;
+			flex: 1;
 		}
 	}
 </style>

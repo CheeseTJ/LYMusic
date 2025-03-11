@@ -2,17 +2,17 @@
 	let firstBackTime = 0
 	export default {
 		onLaunch: function () {
-			console.log('App Launch')
+			// console.log('App Launch')
 		},
 		onShow: function () {
-			console.log('App Show')
+			// console.log('App Show')
 		},
 		onHide: function () {
-			console.log('App Hide')
+			// console.log('App Hide')
 		},
 		// #ifdef APP-ANDROID
 		onLastPageBackPress: function () {
-			console.log('App LastPageBackPress')
+			// console.log('App LastPageBackPress')
 			if (firstBackTime == 0) {
 				uni.showToast({
 					title: '再按一次退出应用',
